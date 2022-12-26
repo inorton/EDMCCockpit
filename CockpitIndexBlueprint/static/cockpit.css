@@ -3,3 +3,7 @@ body {
     color: orange;
     font-family: monospace;
 }
+
+td, th {
+    text-align: left;
+}

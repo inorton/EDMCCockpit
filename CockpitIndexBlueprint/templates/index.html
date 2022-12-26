@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDMC Cockpit</title>
+  <link rel="stylesheet" href="/static/cockpit.css"/>
+</head>
+<body>
+<h1>EDMC Cockpit &gt;</h1>
+<table>
+    <tr>
+        <th>EDMC Version:</th><td>{{ module.edmc_version }}</td>
+    </tr>
+    <tr>
+        <th>Python Version:</th><td>{{ module.python_version }}</td>
+    </tr>
+</table>
+<p>
+    Available modules:
+</p>
+<ul>
+    {% for name, module in module.server.modules.items()|sort(attribute='1.name') %}
+        <li><a href="{{ module.url_prefix }}">{{ name }}</a></li>
+    {% endfor %}
+</ul>
+</body>
+</html>

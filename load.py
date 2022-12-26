@@ -3,23 +3,21 @@ try:
     import Tkinter as tk
 except ImportError:
     import tkinter as tk
-import os
 import sys
 import socket
 from ttkHyperlinkLabel import HyperlinkLabel
 
-from cockpit import CockpitServer
+from cockpit import server
+from CockpitIndexBlueprint.routes import home
+
 
 this = sys.modules[__name__]  # For holding module globals
-this.port = 13302
 plugin_name = "CockpitService"
-server = CockpitServer()
+
+server.register_module(home)
 
 
 def plugin_start3(plugindir: str) -> str:
-    global server
-    staticdir = os.path.join(plugindir, "static")
-    server.setup(staticdir)
     server.start()
     return plugin_name
 
