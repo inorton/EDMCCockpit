@@ -82,7 +82,8 @@ def load_module(folder: Path) -> Optional[CockpitModule]:
         spec = importlib.util.spec_from_loader(name, loader)
         module = importlib.util.module_from_spec(spec)
         loader.exec_module(module)
-        return module.plug()
+        if "plug" in dir(module):
+            return module.plug()
     return None
 
 
