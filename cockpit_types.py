@@ -28,6 +28,17 @@ class DashboardItem:
     def docked(self) -> bool:
         return (self.flags & edmc_data.FlagsDocked) != 0
 
+    @property
+    def scooping(self) -> bool:
+        return (self.flags & edmc_data.FlagsScoopingFuel) != 0
+
+    @property
+    def low_fuel(self) -> bool:
+        return (self.flags & edmc_data.FlagsLowFuel) != 0
+
+    @property
+    def overheating(self) -> bool:
+        return (self.flags & edmc_data.FlagsOverHeating) != 0
 
 @dataclass
 class JournalItem:

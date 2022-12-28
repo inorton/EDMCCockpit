@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main Fuel Status</title>
+    <link rel="stylesheet" href="/static/cockpit.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+            integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
+
+</head>
+<body>
+
+
+<h3>Fuel <span id="main_total">0</span>t</h3>
+<div>
+    <canvas id="main_fuel"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script type="text/javascript">
+    const main_fuel_gauge = $("#main_fuel");
+    const main_fuel_chart = new Chart(main_fuel_gauge, {
+        type: 'doughnut',
+        data: {
+            labels: ["Empty", "Main"],
+            datasets: [
+                {
+                    data: [1, 0],
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            legend: {
+                position: "left"
+            }
+        }
+    });
+
+    const fuel_event = (data) => {
+        let event = jQuery.parseJSON(data);
+        $("#main_total").text(event.FuelMain.toFixed(2) + "/" + event.max);
+        let empty = event.max - event.FuelMain;
+        main_fuel_chart.data.datasets[0].data[0] = empty;
+        main_fuel_chart.data.datasets[0].data[1] = event.FuelMain;
+        main_fuel_chart.update();
+    };
+
+    const socket = new WebSocket('ws://' + location.host + '/fuel/events');
+    socket.addEventListener('message', ev => {
+        fuel_event(ev.data);
+    });
+
+</script>
+</body>
+</html>
