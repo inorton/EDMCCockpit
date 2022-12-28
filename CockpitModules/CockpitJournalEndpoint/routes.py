@@ -36,3 +36,6 @@ def events(ws: simple_websocket.Server):
             if message.entry:
                 ws.send(json.dumps(message.entry))
 
+
+def plug() -> CockpitModule:
+    return journal_module

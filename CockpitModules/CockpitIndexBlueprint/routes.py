@@ -36,3 +36,7 @@ home = IndexModule()
 def homepage():
     """Cockpit Homepage"""
     return render_template("index.html", module=home)
+
+
+def plug() -> CockpitModule:
+    return home

@@ -35,3 +35,7 @@ def events(ws: simple_websocket.Server):
             message = msgs.queue.get()
             if message.entry:
                 ws.send(json.dumps(message.entry))
+
+
+def plug() -> CockpitModule:
+    return dashboard_module

@@ -9,17 +9,9 @@ import socket
 from ttkHyperlinkLabel import HyperlinkLabel
 
 from cockpit import server
-from CockpitModules.CockpitIndexBlueprint.routes import home
-from CockpitModules.CockpitJournalEndpoint.routes import journal_module
-from CockpitModules.CockpitDashEndpoint.routes import dashboard_module
-
 
 this = sys.modules[__name__]  # For holding module globals
 plugin_name = "CockpitService"
-
-server.register_module(home)
-server.register_module(journal_module)
-server.register_module(dashboard_module)
 
 
 def plugin_start3(plugindir: str) -> str:

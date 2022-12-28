@@ -1,17 +1,22 @@
 """Base classes for Cockpit Service"""
-from typing import Dict, Any, Optional, Set
-
+from typing import Dict, Any, Optional
 from libs import Flask, Sock
 from threading import Thread
 from pathlib import Path
+import importlib.util
+import importlib.machinery
 from cockpit_types import CockpitModule
 
 
 HTTP_PORT = 13302
 LISTEN_ADDR = "0.0.0.0"
-SERVER_ROOT = Path(__file__).parent.absolute() / "root"
+SERVER_ROOT = Path(__file__).parent.absolute() / "root"  # intentionally empty
+
+MODULES_DIR = Path(__file__).parent.absolute() / "CockpitModules"
+
 app = Flask("EDMC Cockpit", root_path=str(SERVER_ROOT), static_folder=None)
 sock = Sock(app)
+
 
 
 class CockpitServer(Thread):
@@ -59,5 +64,28 @@ class CockpitServer(Thread):
             module: CockpitModule
             module.dashboard_entry(cmdr, is_beta, entry)
 
+    def load_modules(self):
+        modules = MODULES_DIR.glob("*")
+        for item in modules:
+            if item.is_dir():
+                module = load_module(item)
+                if module:
+                    self.register_module(module)
+
+
+def load_module(folder: Path) -> Optional[CockpitModule]:
+    """load a cockpit module from a folder and return the blueprint"""
+    routes_file = [x for x in folder.glob("routes.py")]
+    if routes_file:
+        name = f"{folder.name}.routes"
+        loader = importlib.machinery.SourceFileLoader(name, str(routes_file[0]))
+        spec = importlib.util.spec_from_loader(name, loader)
+        module = importlib.util.module_from_spec(spec)
+        loader.exec_module(module)
+        return module.plug()
+    return None
+
 
 server = CockpitServer(app)
+server.load_modules()
+
