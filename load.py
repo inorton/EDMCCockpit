@@ -1,6 +1,5 @@
 """The CockpitService server plugin"""
 from typing import Dict, Any
-
 try:
     import Tkinter as tk
 except ImportError:
@@ -10,9 +9,9 @@ import socket
 from ttkHyperlinkLabel import HyperlinkLabel
 
 from cockpit import server
-from CockpitIndexBlueprint.routes import home
-from CockpitJournalEndpoint.routes import journal_module
-from CockpitDashEndpoint.routes import dashboard_module
+from CockpitModules.CockpitIndexBlueprint.routes import home
+from CockpitModules.CockpitJournalEndpoint.routes import journal_module
+from CockpitModules.CockpitDashEndpoint.routes import dashboard_module
 
 
 this = sys.modules[__name__]  # For holding module globals

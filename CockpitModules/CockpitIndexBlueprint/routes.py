@@ -11,6 +11,8 @@ class IndexModule(CockpitModule):
     def __init__(self):
         super(IndexModule, self).__init__("cockpit_home",
                                           url_prefix="/",
+                                          static_folder="static",
+                                          template_folder="templates",
                                           root_path=str(Path(__file__).parent.absolute()))
 
     @property
