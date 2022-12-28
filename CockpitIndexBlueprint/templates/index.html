@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>EDMC Cockpit</title>
-  <link rel="stylesheet" href="/static/cockpit.css"/>
+    <link rel="stylesheet" href="/static/cockpit.css"/>
 </head>
 <body>
 <h1>EDMC Cockpit &gt;</h1>
@@ -20,7 +20,13 @@
 </p>
 <ul>
     {% for name, module in module.server.modules.items()|sort(attribute='1.name') %}
-        <li><a href="{{ module.url_prefix }}">{{ name }}</a></li>
+        <li>
+        {% if module.has_page and module.url_prefix %}
+            <a href="{{ module.url_prefix }}">{{ name }}</a>
+        {% else %}
+            {{ name }}
+        {% endif %} - <i>{{ module.__doc__ }}</i>
+        </li>
     {% endfor %}
 </ul>
 </body>

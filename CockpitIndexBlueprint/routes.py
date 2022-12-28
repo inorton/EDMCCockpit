@@ -2,12 +2,12 @@ from flask import render_template
 from pathlib import Path
 from cockpit import server, CockpitServer
 from cockpit_types import CockpitModule
-from EDMarketConnector import appversion
+from config import appversion
 import sys
 
 
 class IndexModule(CockpitModule):
-
+    """The EDMC Cockpit index module (builtin)"""
     def __init__(self):
         super(IndexModule, self).__init__("cockpit_home",
                                           url_prefix="/",
@@ -20,7 +20,6 @@ class IndexModule(CockpitModule):
     @property
     def edmc_version(self) -> str:
         return str(appversion())
-
 
     @property
     def python_version(self) -> str:

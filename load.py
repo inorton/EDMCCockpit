@@ -1,4 +1,6 @@
 """The CockpitService server plugin"""
+from typing import Dict, Any
+
 try:
     import Tkinter as tk
 except ImportError:
@@ -9,12 +11,16 @@ from ttkHyperlinkLabel import HyperlinkLabel
 
 from cockpit import server
 from CockpitIndexBlueprint.routes import home
+from CockpitJournalEndpoint.routes import journal_module
+from CockpitDashEndpoint.routes import dashboard_module
 
 
 this = sys.modules[__name__]  # For holding module globals
 plugin_name = "CockpitService"
 
 server.register_module(home)
+server.register_module(journal_module)
+server.register_module(dashboard_module)
 
 
 def plugin_start3(plugindir: str) -> str:
@@ -41,3 +47,16 @@ def plugin_app(parent: tk.Frame):
     this.link.grid(row=1, column=1, sticky=tk.EW)
     return frame
 
+
+def journal_entry(cmdr: str,
+                  is_beta: bool,
+                  system_name: str,
+                  station: str,
+                  entry: Dict[str, Any],
+                  state: Dict[str, Any]
+                  ):
+    return server.journal_entry(cmdr, is_beta, system_name, station, entry, state)
+
+
+def dashboard_entry(cmdr: str, is_beta: bool, entry: Dict[str, Any]):
+    server.dashboard_entry(cmdr, is_beta, entry)

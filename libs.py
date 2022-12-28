@@ -1,19 +1,14 @@
 from pathlib import Path
 import sys
 
-HERE = Path(__file__).parent
+HERE = Path(__file__).parent.absolute()
+PACKAGES = str(HERE / "packages")
 
-try:
-    import flask
-except ImportError:
-    flask = None
-
-if flask is None:
+if PACKAGES not in sys.path:
     # nobody has shipped flask, we need to use our bundled copy
-    sys.path.append(str(HERE / "packages"))
+    sys.path.append(PACKAGES)
 
-try:
-    from flask import Flask
-except ImportError:
-    Flask = None  # wont happen, just to placate PyCharm
+from flask import Flask
+from flask_sock import Sock
+
 
