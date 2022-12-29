@@ -1,11 +1,22 @@
+import dataclasses
 from pathlib import Path
 import json
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 import simple_websocket
 from flask import render_template
 from cockpit_types import CockpitModule, QueueSubscriber, DashboardItem
 from cockpit import sock
+
+
+@dataclasses.dataclass
+class RouteStar:
+    name: str
+    starclass: str
+
+    @property
+    def can_scoop(self) -> bool:
+        return self.starclass in "KGBFOAM"
 
 
 class FuelModule(CockpitModule):
@@ -16,8 +27,12 @@ class FuelModule(CockpitModule):
                                          root_path=str(Path(__file__).parent.absolute()))
         self.fuel_tanks = []
         self.max_capacity = 0.0
-        self.route_scoopables = []
-        self.next_star_scoopable = False
+        self.navroute: List[RouteStar] = []
+        self.next_star: Optional[RouteStar] = None
+
+    @property
+    def calibrated(self) -> bool:
+        return len(self.fuel_tanks) > 0
 
     def update_tank_capacity(self):
         total = 0.0
@@ -60,15 +75,19 @@ class FuelModule(CockpitModule):
             self.update_tank_capacity()
         elif event == "NavRoute":
             route = entry.get("Route", [])
-            self.route_scoopables.clear()
+            self.navroute.clear()
             for jump in route:
-                scoopable = jump.get("StarClass", "x") in "OBAFGKM"
-                self.route_scoopables.append(scoopable)
+                star = RouteStar(jump["StarSystem"], jump["StarClass"])
+                self.navroute.append(star)
 
         elif event == "NavRouteClear":
-            self.route_scoopables.clear()
+            self.route.clear()
         elif event == "FSDTarget":
-            self.next_star_scoopable = entry.get("StarClass", "x") in "OBAFGKM"
+            next_star = RouteStar(entry["Name"], entry["StarClass"])
+            self.next_star = next_star
+        elif event == "FSDJump":
+            # jumping, remove the star from the route
+            self.navroute = [star for star in self.navroute if star.name != entry["StarSystem"]]
 
     def has_page(self) -> bool:
         return True
@@ -98,13 +117,18 @@ def events(ws: simple_websocket.Server):
                 data = dict(message.entry.get("Fuel", {}))
                 if "FuelMain" not in data:
                     continue
-                data["route"] = list(module.route_scoopables)
-                data["scoop_next"] = module.next_star_scoopable
+                data["route"] = [{
+                    "name": x.name,
+                    "starclass": x.starclass,
+                    "can_scoop": x.can_scoop,
+                } for x in module.navroute]
+                data["scoop_next"] = module.next_star.can_scoop
                 data["scooping"] = message.scooping
                 data["low"] = message.low_fuel
                 data["overheat"] = message.overheating
                 module.max_capacity = max(module.max_capacity, data["FuelMain"])
                 data["max"] = module.tank_capacity
+                data["calibrated"] = module.calibrated
                 dump = json.dumps(data)
 
                 if dump == previous:

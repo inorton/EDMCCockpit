@@ -51,3 +51,7 @@ td, th {
     background-color: red;
     color: black;
 }
+
+.progress-bar {
+    border-right: 1px solid black;
+}

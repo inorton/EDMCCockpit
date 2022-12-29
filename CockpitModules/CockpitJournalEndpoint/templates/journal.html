@@ -20,7 +20,7 @@
         let $logs = $('#logs');
         $logs.prepend(text + "\n");
         let txt = $logs.text();
-        $logs.text(txt.substring(0, 4096));
+        $logs.text(txt.substring(0, 32768));
     };
 
     const socket = new WebSocket('ws://' + location.host + '/journal/events');

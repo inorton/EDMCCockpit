@@ -4,7 +4,7 @@ Main Fuel Status
 {% endblock %}
 {% block content %}
 <div class="chart_small_square float_left">
-    <h4 class="chart_center">Fuel<br/><span id="main_total">0</span>t</h4>
+    <h4 class="chart_center">Fuel<br/><span id="main_total">?</span>t</h4>
     <canvas id="main_fuel"></canvas>
 </div>
 <div class="lamp_container float_left">
@@ -46,8 +46,13 @@ Main Fuel Status
 
     const fuel_event = (data) => {
         let event = jQuery.parseJSON(data)
-        $("#main_total").text(event["FuelMain"].toFixed(1) + "/" + event["max"].toFixed(0))
-        main_fuel_chart.data.datasets[0].data[0] = event["max"] - event["FuelMain"]
+        let tank_max = event["max"]
+        if (! event["calibrated"]) {
+            tank_max = tank_max + 8
+        }
+        $("#main_total").text(event["FuelMain"].toFixed(1) + "/" + tank_max.toFixed(0))
+
+        main_fuel_chart.data.datasets[0].data[0] = tank_max - event["FuelMain"]
         main_fuel_chart.data.datasets[0].data[1] = event["FuelReservoir"]
         main_fuel_chart.data.datasets[0].data[2] = event["FuelMain"]
         main_fuel_chart.update()
@@ -59,7 +64,7 @@ Main Fuel Status
             let width = size + "%"
             event["route"].forEach(
                 (route_item) => {
-                    if (route_item) {
+                    if (route_item["can_scoop"]) {
                         progress.append(
                             "<div class='progress-bar bg-success' style='width: " + width + "'>")
                     } else {
