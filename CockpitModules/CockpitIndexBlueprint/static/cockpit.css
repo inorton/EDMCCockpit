@@ -7,3 +7,43 @@ body {
 td, th {
     text-align: left;
 }
+
+.float_left {
+    float: left;
+}
+
+.chart_small_square {
+    display: inline-block;
+    position: relative;
+    height: 8cm;
+    width: 8cm;
+}
+
+.chart_center {
+    display: block;
+    position: fixed;
+    z-index: 2;
+    height: inherit;
+    width: inherit;
+    text-align: center;
+    transform: translateY(36%);
+}
+
+.lamp {
+    border: 1px solid orange;
+    width: 2.6cm;
+    font-size: larger;
+    text-align: center;
+    padding: 3px;
+    margin-bottom: 2px;
+}
+
+.inverse {
+    background-color: orange;
+    color: black;
+}
+
+.inverse-warning {
+    background-color: red;
+    color: black;
+}

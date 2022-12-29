@@ -16,6 +16,8 @@ class FuelModule(CockpitModule):
                                          root_path=str(Path(__file__).parent.absolute()))
         self.fuel_tanks = []
         self.max_capacity = 0.0
+        self.route_scoopables = []
+        self.next_star_scoopable = False
 
     def update_tank_capacity(self):
         total = 0.0
@@ -49,12 +51,24 @@ class FuelModule(CockpitModule):
 
     def journal_entry(self, cmdr: str, is_beta: bool, system_name: str, station: str, entry: Dict[str, Any],
                       state: Dict[str, Any]):
-        if entry.get("event", None) == "Loadout":
+        event = entry.get("event", None)
+        if event == "Loadout":
             self.fuel_tanks.clear()
             for item in entry.get("Modules", []):
                 if "_fueltank_" in item.get("Item"):
                     self.fuel_tanks.append(item["Item"])
             self.update_tank_capacity()
+        elif event == "NavRoute":
+            route = entry.get("Route", [])
+            self.route_scoopables.clear()
+            for jump in route:
+                scoopable = jump.get("StarClass", "x") in "OBAFGKM"
+                self.route_scoopables.append(scoopable)
+
+        elif event == "NavRouteClear":
+            self.route_scoopables.clear()
+        elif event == "FSDTarget":
+            self.next_star_scoopable = event.get("StarClass", "x") in "OBAFGKM"
 
     def has_page(self) -> bool:
         return True
@@ -80,15 +94,21 @@ def events(ws: simple_websocket.Server):
         while ws.connected:
             # send only fuel events to clients
             message: DashboardItem = msgs.queue.get()
-            if message.entry:
+            if message.entry and "Fuel" in message.entry:
                 data = dict(message.entry.get("Fuel", {}))
+                if "FuelMain" not in data:
+                    continue
+                data["route"] = list(module.route_scoopables)
+                data["scoop_next"] = module.next_star_scoopable
                 data["scooping"] = message.scooping
                 data["low"] = message.low_fuel
                 data["overheat"] = message.overheating
                 module.max_capacity = max(module.max_capacity, data["FuelMain"])
                 data["max"] = module.tank_capacity
                 dump = json.dumps(data)
-                if dump != previous:
-                    data["timestamp"] = message.entry["timestamp"]
-                    ws.send(json.dumps(data))
+
+                if dump == previous:
+                    continue
+                data["timestamp"] = message.entry["timestamp"]
+                ws.send(json.dumps(data))
                 previous = dump
