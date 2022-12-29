@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Main Fuel Status</title>
-    <link rel="stylesheet" href="/static/cockpit.css"/>
-    <script src="https://code.jquery.com/jquery-3.6.3.min.js"
-            integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"></script>
-
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}
+Main Fuel Status
+{% endblock %}
+{% block content %}
 <div class="chart_small_square float_left">
     <h2 class="chart_center">Fuel<br/><span id="main_total">0</span>t</h2>
     <canvas id="main_fuel"></canvas>
@@ -23,7 +15,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script type="text/javascript">
-    const main_fuel_gauge = $("#main_fuel");
+    const main_fuel_gauge = $("#main_fuel")
     const main_fuel_chart = new Chart(main_fuel_gauge, {
         type: 'doughnut',
         data: {
@@ -45,36 +37,36 @@
                 }
             }
         }
-    });
+    })
 
     const fuel_event = (data) => {
-        let event = jQuery.parseJSON(data);
-        $("#main_total").text(event["FuelMain"].toFixed(2) + "/" + event["max"]);
-        main_fuel_chart.data.datasets[0].data[0] = event["max"] - event["FuelMain"];
-        main_fuel_chart.data.datasets[0].data[1] = event["FuelReservoir"];
-        main_fuel_chart.data.datasets[0].data[2] = event["FuelMain"];
-        main_fuel_chart.update();
+        let event = jQuery.parseJSON(data)
+        $("#main_total").text(event["FuelMain"].toFixed(2) + "/" + event["max"])
+        main_fuel_chart.data.datasets[0].data[0] = event["max"] - event["FuelMain"]
+        main_fuel_chart.data.datasets[0].data[1] = event["FuelReservoir"]
+        main_fuel_chart.data.datasets[0].data[2] = event["FuelMain"]
+        main_fuel_chart.update()
 
-        let $scoop_lamp = $("#scooping");
+        let $scoop_lamp = $("#scooping")
         if (event["scooping"]) {
-            $scoop_lamp.toggleClass("inverse", true);
+            $scoop_lamp.toggleClass("inverse", true)
         } else {
-            $scoop_lamp.toggleClass("inverse", false);
+            $scoop_lamp.toggleClass("inverse", false)
         }
-        let $overheat_lamp = $("#overheat");
+        let $overheat_lamp = $("#overheat")
         if (event["overheat"]) {
-            $overheat_lamp.toggleClass("inverse-warning", true);
+            $overheat_lamp.toggleClass("inverse-warning", true)
         } else {
-            $overheat_lamp.toggleClass("inverse-warning", false);
+            $overheat_lamp.toggleClass("inverse-warning", false)
         }
 
-    };
+    }
 
-    const socket = new WebSocket('ws://' + location.host + '/fuel/events');
+    const socket = new WebSocket('ws://' + location.host + '/fuel/events')
     socket.addEventListener('message', ev => {
-        fuel_event(ev.data);
-    });
+        fuel_event(ev.data)
+    })
+
 
 </script>
-</body>
-</html>
+{% endblock %}
