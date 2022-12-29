@@ -29,10 +29,15 @@ td, th {
     transform: translateY(36%);
 }
 
+.lamp_container {
+    padding: 2px;
+    width: 3cm;
+}
+
 .lamp {
     border: 1px solid orange;
     width: 2.6cm;
-    font-size: larger;
+    font-size: x-large;
     text-align: center;
     padding: 3px;
     margin-bottom: 2px;
