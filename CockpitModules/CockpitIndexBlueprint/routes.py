@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, send_from_directory
 from pathlib import Path
 from cockpit import server, CockpitServer
 from cockpit_types import CockpitModule
@@ -36,6 +36,13 @@ home = IndexModule()
 def homepage():
     """Cockpit Homepage"""
     return render_template("index.html", module=home)
+
+
+@home.route("/favicon.ico")
+def favicon():
+    return send_from_directory(
+        str(Path(home.root_path) / home.static_folder), "EDMarketConnector.ico",
+        mimetype="image/vnd.microsoft.icon")
 
 
 def plug() -> CockpitModule:
