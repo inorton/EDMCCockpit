@@ -4,12 +4,16 @@ Main Fuel Status
 {% endblock %}
 {% block content %}
 <div class="chart_small_square float_left">
-    <h2 class="chart_center">Fuel<br/><span id="main_total">0</span>t</h2>
+    <h4 class="chart_center">Fuel<br/><span id="main_total">0</span>t</h4>
     <canvas id="main_fuel"></canvas>
 </div>
 <div class="lamp_container float_left">
-    <div id="scooping" class="lamp">SCOOPING</div>
-    <div id="overheat" class="lamp">OVERHEAT</div>
+    <div id="scooping" class="lamp">SCOOP</div>
+    <div id="overheat" class="lamp">HEAT</div>
+</div>
+<div class="chart_small_square float_left">
+    <p>Route Fuel Stars:</p>
+    <div id="route_scoops"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -38,14 +42,34 @@ Main Fuel Status
             }
         }
     })
+    const route_fuel_display = $("#route_scoops")
 
     const fuel_event = (data) => {
         let event = jQuery.parseJSON(data)
-        $("#main_total").text(event["FuelMain"].toFixed(2) + "/" + event["max"])
+        $("#main_total").text(event["FuelMain"].toFixed(1) + "/" + event["max"].toFixed(0))
         main_fuel_chart.data.datasets[0].data[0] = event["max"] - event["FuelMain"]
         main_fuel_chart.data.datasets[0].data[1] = event["FuelReservoir"]
         main_fuel_chart.data.datasets[0].data[2] = event["FuelMain"]
         main_fuel_chart.update()
+        route_fuel_display.empty()
+        if (event["route"].length > 0) {
+            route_fuel_display.append("<p>" + event["route"].length + " jumps </p>")
+            let progress = $("<div class='progress' role='progressbar'></div>")
+            let size = 100 / event["route"].length
+            let width = size + "%"
+            event["route"].forEach(
+                (route_item) => {
+                    if (route_item) {
+                        progress.append(
+                            "<div class='progress-bar bg-success' style='width: " + width + "'>")
+                    } else {
+                        progress.append(
+                            "<div class='progress-bar progress-bar-striped bg-danger' style='width: " + width + "'>")
+                    }
+                }
+            )
+            route_fuel_display.append(progress)
+        }
 
         let $scoop_lamp = $("#scooping")
         if (event["scooping"]) {

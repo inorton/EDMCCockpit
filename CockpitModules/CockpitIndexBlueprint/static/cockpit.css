@@ -13,15 +13,14 @@ td, th {
 }
 
 .chart_small_square {
-    display: inline-block;
-    position: relative;
-    height: 8cm;
-    width: 8cm;
+    height: 6.5cm;
+    width: 6.5cm;
+    margin: 1px;
 }
 
 .chart_center {
     display: block;
-    position: fixed;
+    position: absolute;
     z-index: 2;
     height: inherit;
     width: inherit;
@@ -36,7 +35,7 @@ td, th {
 
 .lamp {
     border: 1px solid orange;
-    width: 3.6cm;
+    width: 2.5cm;
     font-size: x-large;
     text-align: center;
     padding: 3px;

@@ -68,7 +68,7 @@ class FuelModule(CockpitModule):
         elif event == "NavRouteClear":
             self.route_scoopables.clear()
         elif event == "FSDTarget":
-            self.next_star_scoopable = event.get("StarClass", "x") in "OBAFGKM"
+            self.next_star_scoopable = entry.get("StarClass", "x") in "OBAFGKM"
 
     def has_page(self) -> bool:
         return True
