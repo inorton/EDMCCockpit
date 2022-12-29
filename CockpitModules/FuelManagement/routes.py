@@ -79,9 +79,8 @@ class FuelModule(CockpitModule):
             for jump in route:
                 star = RouteStar(jump["StarSystem"], jump["StarClass"])
                 self.navroute.append(star)
-
         elif event == "NavRouteClear":
-            self.route.clear()
+            self.navroute.clear()
         elif event == "FSDTarget":
             next_star = RouteStar(entry["Name"], entry["StarClass"])
             self.next_star = next_star
@@ -122,7 +121,8 @@ def events(ws: simple_websocket.Server):
                     "starclass": x.starclass,
                     "can_scoop": x.can_scoop,
                 } for x in module.navroute]
-                data["scoop_next"] = module.next_star.can_scoop
+                if module.next_star:
+                    data["scoop_next"] = module.next_star.can_scoop
                 data["scooping"] = message.scooping
                 data["low"] = message.low_fuel
                 data["overheat"] = message.overheating

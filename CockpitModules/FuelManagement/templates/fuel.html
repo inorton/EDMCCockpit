@@ -10,6 +10,7 @@ Main Fuel Status
 <div class="lamp_container float_left">
     <div id="scooping" class="lamp">SCOOP</div>
     <div id="overheat" class="lamp">HEAT</div>
+    <div id="calibrate" class="lamp">CALIB</div>
 </div>
 <div class="chart_small_square float_left">
     <p>Route Fuel Stars:</p>
@@ -87,6 +88,12 @@ Main Fuel Status
             $overheat_lamp.toggleClass("inverse-warning", true)
         } else {
             $overheat_lamp.toggleClass("inverse-warning", false)
+        }
+        let $calib_lamp = $("#calibrate")
+        if (!event["calibrated"]) {
+            $calib_lamp.toggleClass("inverse-warning", true)
+        } else {
+            $calib_lamp.toggleClass("inverse-warning", false)
         }
 
     }
