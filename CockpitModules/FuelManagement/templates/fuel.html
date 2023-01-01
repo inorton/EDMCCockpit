@@ -11,6 +11,7 @@ Main Fuel Status
     <div id="scooping" class="lamp">SCOOP</div>
     <div id="overheat" class="lamp">HEAT</div>
     <div id="calibrate" class="lamp">CALIB</div>
+    <div class="lamp"><span id="fill_time">-</span>s</div>
 </div>
 <div class="chart_small_square float_left">
     <p>Route Fuel Stars:</p>
@@ -21,6 +22,7 @@ Main Fuel Status
 
 <script type="text/javascript">
     const main_fuel_gauge = $("#main_fuel")
+    const fill_time_lamp = $("#fill_time")
     const main_fuel_chart = new Chart(main_fuel_gauge, {
         type: 'doughnut',
         data: {
@@ -52,6 +54,12 @@ Main Fuel Status
             tank_max = tank_max + 8
         }
         $("#main_total").text(event["FuelMain"].toFixed(1) + "/" + tank_max.toFixed(0))
+        let scoop_time = event["scoop_time"]
+        if (scoop_time > 0) {
+            fill_time_lamp.text(scoop_time)
+        } else {
+            fill_time_lamp.text("-")
+        }
 
         main_fuel_chart.data.datasets[0].data[0] = tank_max - event["FuelMain"]
         main_fuel_chart.data.datasets[0].data[1] = event["FuelReservoir"]

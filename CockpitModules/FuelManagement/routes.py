@@ -1,4 +1,5 @@
 import dataclasses
+import time
 from pathlib import Path
 import json
 from typing import Dict, Any, Optional, List
@@ -106,6 +107,9 @@ def fuel():
 
 @sock.route("/events", bp=module)
 def events(ws: simple_websocket.Server):
+    scoop_start_fuel = 0
+    scoop_start_time = 0
+
     with module.subscribe("dashboard") as msgs:
         msgs: QueueSubscriber
         previous = ""
@@ -129,6 +133,23 @@ def events(ws: simple_websocket.Server):
                 module.max_capacity = max(module.max_capacity, data["FuelMain"])
                 data["max"] = module.tank_capacity
                 data["calibrated"] = module.calibrated
+                data["scoop_time"] = -1
+                # calculate scoop ETC
+                if not message.scooping:
+                    scoop_start_time = 0
+                else:
+                    if scoop_start_time == 0:
+                        scoop_start_time = time.monotonic()
+                        scoop_start_fuel = data["FuelMain"]
+                    else:
+                        now = time.monotonic()
+                        scoop_time = now - scoop_start_time
+                        scoop_total = data["FuelMain"] - scoop_start_fuel
+                        scoop_rate = scoop_total / scoop_time  # t/sec
+                        remaining = module.tank_capacity - data["FuelMain"]
+                        scoop_duration = int(remaining / scoop_rate)
+                        data["scoop_time"] = scoop_duration
+
                 dump = json.dumps(data)
 
                 if dump == previous:
