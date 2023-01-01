@@ -18,15 +18,24 @@ EDMC Cockpit
     <p>
         Available modules:
     </p>
-    <ul>
-        {% for name, module in module.server.modules.items()|sort(attribute='1.name') %}
-            <li>
-                {% if module.has_page and module.url_prefix %}
-                    <a href="{{ module.url_prefix }}">{{ name }}</a>
-                {% else %}
-                    {{ name }}
-                {% endif %} - <i>{{ module.__doc__ }}</i>
-            </li>
-        {% endfor %}
-    </ul>
+    <table>
+        <tr>
+            <td style="vertical-align: top">
+                <img src="/qrcode.png" />
+            </td>
+            <td>
+                <ul>
+                    {% for name, module in module.server.modules.items()|sort(attribute='1.name') %}
+                        <li>
+                            {% if module.has_page and module.url_prefix %}
+                                <a href="{{ module.url_prefix }}">{{ name }}</a>
+                            {% else %}
+                                {{ name }}
+                            {% endif %} - <i>{{ module.__doc__ }}</i>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+    </table>
 {% endblock %}

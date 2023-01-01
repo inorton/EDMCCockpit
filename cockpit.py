@@ -1,4 +1,5 @@
 """Base classes for Cockpit Service"""
+import socket
 from typing import Dict, Any, Optional
 from libs import Flask, Sock
 from threading import Thread
@@ -18,7 +19,6 @@ app = Flask("EDMC Cockpit", root_path=str(SERVER_ROOT), static_folder=None)
 sock = Sock(app)
 
 
-
 class CockpitServer(Thread):
 
     def __init__(self, flask_app):
@@ -27,6 +27,7 @@ class CockpitServer(Thread):
         self.port = HTTP_PORT
         self.app = flask_app
         self.modules: Dict[str, CockpitModule] = {}
+        self.ipaddr = socket.gethostbyname(socket.gethostname())
 
     def run(self) -> None:
         self.app.run(host=LISTEN_ADDR, port=HTTP_PORT, use_reloader=False, debug=True)

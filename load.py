@@ -23,8 +23,7 @@ def plugin_app(parent: tk.Frame):
     """
     Create TK widgets for the EDMC main window
     """
-    ipaddr = socket.gethostbyname(socket.gethostname())
-    linktext = "http://{}:{}".format(ipaddr, server.port)
+    linktext = "http://{}:{}".format(server.ipaddr, server.port)
     frame = tk.Frame(parent)
     this.label = tk.Label(
         frame,

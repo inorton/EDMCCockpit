@@ -1,9 +1,12 @@
-from flask import render_template, send_from_directory
+import io
+import sys
+import pyqrcode
+import png
+from flask import render_template, send_from_directory, send_file
 from pathlib import Path
 from cockpit import server, CockpitServer
 from cockpit_types import CockpitModule
 from config import appversion
-import sys
 
 
 class IndexModule(CockpitModule):
@@ -36,6 +39,18 @@ home = IndexModule()
 def homepage():
     """Cockpit Homepage"""
     return render_template("index.html", module=home)
+
+
+@home.route("/qrcode.png")
+def qrcode_png():
+    ipaddr = home.server.ipaddr
+    port = home.server.port
+    url = f"http://{ipaddr}:{port}"
+    qrcode = pyqrcode.create(url)
+    buffer = io.BytesIO()
+    qrcode.png(buffer, scale=4)
+    buffer.seek(0)
+    return send_file(buffer, mimetype="image/png")
 
 
 @home.route("/favicon.ico")
